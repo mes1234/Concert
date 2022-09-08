@@ -16,14 +16,15 @@ namespace SingleThreaded.Tests
         {
             //Arrange
             var receptor = Substitute.For<IReceptor<object>>();
-            var ether = new SingleThreadedEther();
+            var propagationPolicy = new SimplePropagationPolicy();
+            var ether = new SingleThreadedEther(propagationPolicy);
             var note = new Note<object>
             {
                 Content = "data"
             };
 
             //Act
-            await ether.Attach(receptor);
+            await ether.Attach<object>(receptor);
             await ether.Propagate(note);
 
             //Assert

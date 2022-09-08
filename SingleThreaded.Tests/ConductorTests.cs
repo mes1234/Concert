@@ -1,6 +1,7 @@
 using Concert.Abstractions;
 using FluentAssertions;
 using NSubstitute;
+using SingleThreaded.Performers;
 using Xunit;
 
 namespace SingleThreaded.Tests
@@ -11,7 +12,9 @@ namespace SingleThreaded.Tests
         public void WhenAttachingNewPerformerItShouldBeAttachedToEtherTest()
         {
             //Arrange
-            var performer = Substitute.For<IPerformer>();
+            var ether = Substitute.For<IEther>();
+            var receptorFactory = Substitute.For<IReceptorFactory>();
+            var performer = new BasePerformer(ether, receptorFactory);
             var conductor = new SingleThreadedConductor();
 
             //Act

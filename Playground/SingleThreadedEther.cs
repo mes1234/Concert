@@ -11,23 +11,23 @@ namespace SingleThreaded
     {
 
         private readonly IDictionary<Type, ICollection<IReceptor>> _ether = new Dictionary<Type, ICollection<IReceptor>>();
+        private readonly IPropagationPolicy _propagationPolicy;
+
+        public SingleThreadedEther(IPropagationPolicy propagationPolicy)
+        {
+            _propagationPolicy = propagationPolicy;
+        }
 
         public Task Attach<T>(IReceptor<T> receptor)
         {
-            AddReceptor(receptor);
+            AddReceptor<T>(receptor);
 
             return Task.CompletedTask;
         }
 
         public async Task<ExecutionState> Propagate<T>(Note<T> note)
         {
-            // TODO add execution policy and summary
-            foreach (var receptor in GetReceptors<T>())
-            {
-                await receptor.Receive(note).ConfigureAwait(false);
-            }
-
-            return ExecutionState.AllCompleted;
+            return await _propagationPolicy.Execute(GetReceptors<T>(), note).ConfigureAwait(false);
         }
 
         private bool SlotExists(Type type)
@@ -40,7 +40,7 @@ namespace SingleThreaded
             _ether.Add(type, new HashSet<IReceptor>());
         }
 
-        private void AddReceptor<T>(IReceptor<T> receptor)
+        private void AddReceptor<T>(IReceptor receptor)
         {
             var type = typeof(T);
 
@@ -49,9 +49,7 @@ namespace SingleThreaded
                 BootstrapEtherSlot(type);
             }
 
-            var boxedReceptor = (IReceptor)receptor;
-
-            _ether[type].Add(boxedReceptor);
+            _ether[type].Add(receptor);
         }
 
         private IEnumerable<IReceptor<T>> GetReceptors<T>()
@@ -63,12 +61,7 @@ namespace SingleThreaded
 
             var receptors = _ether.Where(x => x.Key == typeof(T)).SelectMany(r => r.Value);
 
-            return receptors.Select(r => Recast<T>(r));
-        }
-
-        private IReceptor<T> Recast<T>(IReceptor receptor)
-        {
-            return (IReceptor<T>)receptor;
+            return receptors.Select(r => (IReceptor<T>)r);
         }
     }
 }

@@ -10,20 +10,19 @@ namespace SingleThreaded.Performers
     public class BasePerformer : IPerformer
     {
         private readonly IEther _ether;
+        private readonly IReceptorFactory _receptorFactory;
 
-
-
-        public BasePerformer(IEther ether)
+        public BasePerformer(IEther ether, IReceptorFactory receptorFactory)
         {
             _ether = ether;
+            _receptorFactory = receptorFactory;
         }
 
         public virtual async Task Register<T>(Func<Note<T>, Task<ExecutionState>> func)
         {
-            // TODO move to factory
-            var receptor = new SingleThreadedReceptor<T>(func);
+            var receptor = _receptorFactory.Build(func);
 
-            await _ether.Attach(receptor);
+            await _ether.Attach(receptor).ConfigureAwait(false);
         }
     }
 }

@@ -12,7 +12,7 @@ namespace Concert.Abstractions
     /// <typeparam name="T">Type of content</typeparam>
     public readonly record struct Note<T>
     {
-        public readonly Guid Id;
         public readonly T Content { get; init; }
+        public Guid Id { get; init; }
     }
 }

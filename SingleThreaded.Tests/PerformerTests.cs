@@ -18,7 +18,8 @@ namespace SingleThreaded.Tests
         {
             //Arrange
             var ether = Substitute.For<IEther>();
-            new PingPongPerformer(ether);
+            var receptorFactory = Substitute.For<IReceptorFactory>();
+            new PingPongPerformer(ether, receptorFactory);
 
             //Assert
             ether.Received(1).Attach<object>(Arg.Any<IReceptor<object>>());
@@ -28,8 +29,10 @@ namespace SingleThreaded.Tests
         public async Task WhenPingPongPerformerIsAttachedAndNoteIsPropagatedPeformerReactsTest()
         {
             //Arrange
-            var ether = new SingleThreadedEther();
-            new PingPongPerformer(ether);
+            var propagationPolicy = new SimplePropagationPolicy();
+            var receptorFactory = Substitute.For<IReceptorFactory>();
+            var ether = new SingleThreadedEther(propagationPolicy);
+            new PingPongPerformer(ether, receptorFactory);
 
             //Act
             var result = await ether.Propagate(new Note<object>());

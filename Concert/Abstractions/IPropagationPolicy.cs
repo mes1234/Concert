@@ -6,11 +6,8 @@ using System.Threading.Tasks;
 
 namespace Concert.Abstractions
 {
-    /// <summary>
-    /// Performer is a worker which does buisness logic
-    /// </summary>
-#pragma warning disable CA1040
-    public interface IPerformer
+    public interface IPropagationPolicy
     {
+        public Task<ExecutionState> Execute<T>(IEnumerable<IReceptor<T>> receptors, Note<T> note);
     }
 }

@@ -9,9 +9,8 @@ namespace SingleThreaded.Performers
 {
     public class PingPongPerformer : BasePerformer
     {
-        public PingPongPerformer(IEther ether) : base(ether)
+        public PingPongPerformer(IEther ether, IReceptorFactory receptorFactory) : base(ether, receptorFactory)
         {
-            // TODO this should be async
             Register<object>(Pong).GetAwaiter().GetResult();
         }
 

@@ -14,7 +14,7 @@ namespace Concert.Abstractions
     {
         public Task Receive(Note<T> note);
     }
-
+#pragma warning disable CA1040
     public interface IReceptor
     {
 
